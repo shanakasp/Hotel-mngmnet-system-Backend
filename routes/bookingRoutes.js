@@ -5,12 +5,7 @@ const auth = require("../middleware/auth");
 const roleCheck = require("../middleware/roleCheck");
 
 // Get all bookings (manager/front_desk only)
-router.get(
-  "/",
-  auth,
-  roleCheck(["manager", "front_desk"]),
-  bookingController.getAllBookings
-);
+router.get("/", bookingController.getAllBookings);
 
 // Get user's bookings
 router.get("/my-bookings", auth, bookingController.getUserBookings);
@@ -22,7 +17,7 @@ router.post("/", auth, bookingController.createBooking);
 router.post(
   "/walk-in",
   auth,
-  roleCheck(["manager", "front_desk"]),
+  roleCheck("front_desk"),
   bookingController.createWalkInBooking
 );
 
