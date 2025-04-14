@@ -8,6 +8,7 @@ const sequelize = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const staffRoutes = require("./routes/staffRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/staff", staffRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {

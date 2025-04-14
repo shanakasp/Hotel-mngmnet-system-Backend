@@ -23,7 +23,7 @@ exports.createRoom = async (req, res) => {
       price,
       capacity,
       description,
-      amenities: amenities ? JSON.parse(amenities) : {},
+      //   amenities: amenities ? JSON.parse(amenities) : {},
     });
 
     // Handle image uploads
@@ -300,12 +300,10 @@ exports.setPrimaryImage = async (req, res) => {
 
     res.status(200).json({ message: "Primary image updated successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Failed to update primary image",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Failed to update primary image",
+      error: error.message,
+    });
   }
 };
 
