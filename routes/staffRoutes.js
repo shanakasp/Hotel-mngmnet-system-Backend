@@ -11,7 +11,7 @@ router.delete("/:id", auth, roleCheck("manager"), staffController.deleteStaff);
 
 // Staff listing and filtering (Manager only)
 router.get("/", auth, roleCheck("manager"), staffController.getAllStaff);
-router.get("/search", auth, roleCheck("manager"), staffController.searchStaff);
+// router.get("/search", auth, roleCheck("manager"), staffController.searchStaff);
 router.get(
   "/department/:department",
   auth,

@@ -39,14 +39,6 @@ const Staff = sequelize.define("Staff", {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },
-  address: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  status: {
-    type: DataTypes.ENUM("active", "inactive", "on_leave"),
-    defaultValue: "active",
-  },
 });
 
 module.exports = Staff;
