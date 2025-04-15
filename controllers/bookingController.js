@@ -334,14 +334,6 @@ exports.cancelBooking = async (req, res) => {
         .json({ message: "Not authorized to cancel this booking" });
     }
 
-    // Check if booking is already checked in
-    if (booking.status === "checked_in") {
-      return res.status(400).json({
-        message:
-          "Cannot cancel booking after check-in. Please contact the hotel.",
-      });
-    }
-
     // Update booking status
     await booking.update({ status: "cancelled" });
 
