@@ -432,7 +432,6 @@ exports.checkRoomAvailability = async (req, res) => {
   }
 };
 
-// Book a room for a walk-in customer (front desk only)
 exports.createWalkInBooking = async (req, res) => {
   try {
     // Only front desk staff or managers can create walk-in bookings
@@ -479,10 +478,41 @@ exports.createWalkInBooking = async (req, res) => {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    if (room.status !== "available") {
+    // Check if there are any existing bookings for this room that overlap with the requested dates
+    const conflictingBooking = await Booking.findOne({
+      where: {
+        roomId: roomId,
+        status: { [Op.notIn]: ["cancelled", "completed"] },
+        [Op.or]: [
+          // Case 1: Check-in date falls between existing booking's check-in and check-out
+          {
+            [Op.and]: [
+              { checkInDate: { [Op.lte]: checkInDate } },
+              { checkOutDate: { [Op.gt]: checkInDate } },
+            ],
+          },
+          // Case 2: Check-out date falls between existing booking's check-in and check-out
+          {
+            [Op.and]: [
+              { checkInDate: { [Op.lt]: checkOutDate } },
+              { checkOutDate: { [Op.gte]: checkOutDate } },
+            ],
+          },
+          // Case 3: Existing booking falls completely within the new booking dates
+          {
+            [Op.and]: [
+              { checkInDate: { [Op.gte]: checkInDate } },
+              { checkOutDate: { [Op.lte]: checkOutDate } },
+            ],
+          },
+        ],
+      },
+    });
+
+    if (conflictingBooking) {
       return res
         .status(400)
-        .json({ message: "Room is not available for booking" });
+        .json({ message: "Room is not available for the selected dates" });
     }
 
     // Calculate nights and total price
@@ -501,7 +531,7 @@ exports.createWalkInBooking = async (req, res) => {
       specialRequests,
       totalAmount: totalPrice,
       nights,
-      status: "checked_in", // Automatically check in for walk-in customers
+      status: "confirmed", // Automatically check in for walk-in customers
       createdBy: req.user.id, // Track which staff member created the booking
     });
 
@@ -539,7 +569,6 @@ exports.createWalkInBooking = async (req, res) => {
     });
   }
 };
-
 // Get occupancy report (for managers)
 exports.getOccupancyReport = async (req, res) => {
   try {
