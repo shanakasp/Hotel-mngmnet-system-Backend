@@ -22,7 +22,13 @@ const RoomImage = sequelize.define("RoomImage", {
   },
 });
 
-RoomImage.belongsTo(Room, { foreignKey: "roomId", onDelete: "CASCADE" });
-Room.hasMany(RoomImage, { foreignKey: "roomId" });
+Room.hasMany(RoomImage, {
+  foreignKey: "roomId",
+  onDelete: "CASCADE", // Enable cascading delete
+});
+RoomImage.belongsTo(Room, {
+  foreignKey: "roomId",
+  onDelete: "CASCADE", // Enable cascading delete
+});
 
 module.exports = RoomImage;

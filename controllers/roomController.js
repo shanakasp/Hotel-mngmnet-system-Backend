@@ -1,8 +1,31 @@
 const Room = require("../models/Room");
+const Booking = require("../models/Booking");
 const RoomImage = require("../models/RoomImage");
-const { Op } = require("sequelize");
-const fs = require("fs");
-const path = require("path");
+const cloudinary = require("cloudinary").v2;
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Helper function to upload image to Cloudinary
+const uploadToCloudinary = async (file) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload(
+      file.path, // Path of the temporary uploaded file
+      { folder: "hotel_rooms" }, // Optional folder name in Cloudinary
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          return reject(error);
+        }
+        resolve(result.secure_url); // Return the secure URL of the uploaded file
+      }
+    );
+  });
+};
 
 // Create a new room (Manager only)
 exports.createRoom = async (req, res) => {
@@ -24,26 +47,22 @@ exports.createRoom = async (req, res) => {
       capacity,
       description,
       ACorNot,
-      //   amenities: amenities ? JSON.parse(amenities) : {},
     });
 
     // Handle image uploads
     if (req.files && req.files.length > 0) {
-      // Create directory for room images if it doesn't exist
-      const roomDir = path.join(__dirname, "../uploads", `room_${room.id}`);
-      if (!fs.existsSync(roomDir)) {
-        fs.mkdirSync(roomDir, { recursive: true });
-      }
-
-      // Save images to database
       const roomImages = [];
       for (let i = 0; i < req.files.length; i++) {
         const file = req.files[i];
         const isPrimary = i === 0; // First image is primary
 
+        // Upload image to Cloudinary
+        const secureUrl = await uploadToCloudinary(file);
+
+        // Save image URL to the database
         const roomImage = await RoomImage.create({
           roomId: room.id,
-          imagePath: `/uploads/room_${room.id}/${file.filename}`,
+          imagePath: secureUrl, // Store Cloudinary URL in the database
           description: `Image ${i + 1} for Room ${room.roomNumber}`,
           isPrimary,
         });
@@ -64,9 +83,7 @@ exports.createRoom = async (req, res) => {
       .status(500)
       .json({ message: "Failed to create room", error: error.message });
   }
-};
-
-// Get all rooms
+}; // Get all rooms
 exports.getAllRooms = async (req, res) => {
   try {
     const { status, type } = req.query;
@@ -80,9 +97,17 @@ exports.getAllRooms = async (req, res) => {
       whereClause.type = type;
     }
 
+    // Make sure to import the required models at the top of your controller file
+    const Room = require("../models/Room");
+    const Booking = require("../models/Booking");
+    const RoomImage = require("../models/RoomImage"); // Make sure this model exists
+
     const rooms = await Room.findAll({
       where: whereClause,
-      include: [{ model: RoomImage }],
+      include: [
+        { model: RoomImage },
+        // { model: Booking }, // This will work once associations are properly set up
+      ],
       order: [["roomNumber", "ASC"]],
     });
 
@@ -93,7 +118,6 @@ exports.getAllRooms = async (req, res) => {
       .json({ message: "Failed to get rooms", error: error.message });
   }
 };
-
 // Get room by ID
 exports.getRoomById = async (req, res) => {
   try {
@@ -238,18 +262,6 @@ exports.deleteRoom = async (req, res) => {
     const room = await Room.findByPk(req.params.id, {
       include: [{ model: RoomImage }],
     });
-
-    if (!room) {
-      return res.status(404).json({ message: "Room not found" });
-    }
-
-    // Delete room images from filesystem
-    if (room.RoomImages && room.RoomImages.length > 0) {
-      const roomDir = path.join(__dirname, "..", "uploads", `room_${room.id}`);
-      if (fs.existsSync(roomDir)) {
-        fs.rmSync(roomDir, { recursive: true, force: true });
-      }
-    }
 
     // Delete room from database (cascade will delete images)
     await room.destroy();

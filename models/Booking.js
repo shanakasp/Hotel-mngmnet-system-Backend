@@ -62,6 +62,7 @@ const Booking = sequelize.define(
         "confirmed",
         "checked_in",
         "checked_out",
+        "cancelPending",
         "cancelled"
       ),
       defaultValue: "pending",
@@ -82,7 +83,7 @@ const Booking = sequelize.define(
   }
 );
 
-// Set up associations
+// Set up associations properly
 Booking.belongsTo(User, { foreignKey: "userId" });
 Booking.belongsTo(Room, { foreignKey: "roomId" });
 

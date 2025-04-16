@@ -147,12 +147,6 @@ exports.createBooking = async (req, res) => {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    if (room.status !== "available") {
-      return res
-        .status(400)
-        .json({ message: "Room is not available for booking" });
-    }
-
     if (guestCount > room.capacity) {
       return res.status(400).json({
         message: `Room capacity exceeded. Maximum capacity is ${room.capacity} guests`,
@@ -335,13 +329,10 @@ exports.cancelBooking = async (req, res) => {
     }
 
     // Update booking status
-    await booking.update({ status: "cancelled" });
-
-    // Update room status
-    await booking.Room.update({ status: "available" });
+    await booking.update({ status: "checked_out" });
 
     res.status(200).json({
-      message: "Booking cancelled successfully",
+      message: "Booking cancel request send",
     });
   } catch (error) {
     res.status(500).json({
