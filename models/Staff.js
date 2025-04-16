@@ -7,6 +7,10 @@ const Staff = sequelize.define("Staff", {
     autoIncrement: true,
     primaryKey: true,
   },
+  govtID: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -23,6 +27,10 @@ const Staff = sequelize.define("Staff", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  gender: {
+    type: DataTypes.ENUM("male", "female"),
+    allowNull: false,
+  },
   department: {
     type: DataTypes.ENUM(
       "housekeeping",
@@ -31,7 +39,8 @@ const Staff = sequelize.define("Staff", {
       "reception",
       "kitchen",
       "security",
-      "maintenance"
+      "maintenance",
+      "front_desk"
     ),
     allowNull: false,
   },

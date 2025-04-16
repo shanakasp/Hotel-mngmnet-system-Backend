@@ -13,7 +13,7 @@ const Room = sequelize.define("Room", {
     unique: true,
   },
   type: {
-    type: DataTypes.ENUM("single", "double", "suite", "deluxe"),
+    type: DataTypes.ENUM("standard", "suite", "deluxe"),
     allowNull: false,
   },
   price: {
@@ -28,6 +28,10 @@ const Room = sequelize.define("Room", {
   description: {
     type: DataTypes.TEXT,
     allowNull: true,
+  },
+  ACorNot: {
+    type: DataTypes.ENUM("AC", "Non AC"),
+    allowNull: false,
   },
   status: {
     type: DataTypes.ENUM("available", "occupied", "maintenance"),

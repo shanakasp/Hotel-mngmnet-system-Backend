@@ -7,7 +7,7 @@ const path = require("path");
 // Create a new room (Manager only)
 exports.createRoom = async (req, res) => {
   try {
-    const { roomNumber, type, price, capacity, description, amenities } =
+    const { roomNumber, type, price, capacity, description, ACorNot } =
       req.body;
 
     // Check if room number already exists
@@ -23,6 +23,7 @@ exports.createRoom = async (req, res) => {
       price,
       capacity,
       description,
+      ACorNot,
       //   amenities: amenities ? JSON.parse(amenities) : {},
     });
 
@@ -141,15 +142,8 @@ exports.searchRoomByNumber = async (req, res) => {
 // Update room (Manager only)
 exports.updateRoom = async (req, res) => {
   try {
-    const {
-      roomNumber,
-      type,
-      price,
-      capacity,
-      description,
-      status,
-      amenities,
-    } = req.body;
+    const { roomNumber, type, price, capacity, description, status, ACorNot } =
+      req.body;
 
     const room = await Room.findByPk(req.params.id);
 
@@ -168,13 +162,11 @@ exports.updateRoom = async (req, res) => {
     // Update fields
     if (roomNumber) room.roomNumber = roomNumber;
     if (type) room.type = type;
+    if (ACorNot) room.ACorNot = ACorNot;
     if (price) room.price = price;
     if (capacity) room.capacity = capacity;
     if (description) room.description = description;
     if (status) room.status = status;
-    if (amenities)
-      room.amenities =
-        typeof amenities === "string" ? JSON.parse(amenities) : amenities;
 
     await room.save();
 

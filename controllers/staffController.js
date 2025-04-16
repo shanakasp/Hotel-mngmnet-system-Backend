@@ -4,8 +4,16 @@ const { Op } = require("sequelize");
 // Create a new staff member (Manager only)
 exports.createStaff = async (req, res) => {
   try {
-    const { name, phoneNumber, salary, age, department, joiningDate } =
-      req.body;
+    const {
+      name,
+      phoneNumber,
+      salary,
+      age,
+      department,
+      joiningDate,
+      gender,
+      govtID,
+    } = req.body;
 
     // Create new staff
     const staff = await Staff.create({
@@ -15,6 +23,8 @@ exports.createStaff = async (req, res) => {
       age,
       department,
       joiningDate,
+      gender,
+      govtID,
     });
 
     res.status(201).json(staff);
@@ -72,8 +82,17 @@ exports.getStaffById = async (req, res) => {
 // Update staff (Manager only)
 exports.updateStaff = async (req, res) => {
   try {
-    const { name, phoneNumber, salary, age, department, address, status } =
-      req.body;
+    const {
+      name,
+      phoneNumber,
+      salary,
+      age,
+      department,
+      address,
+      status,
+      gender,
+      govtID,
+    } = req.body;
 
     const staff = await Staff.findByPk(req.params.id);
 
@@ -84,6 +103,8 @@ exports.updateStaff = async (req, res) => {
     // Update fields
     if (name) staff.name = name;
     if (phoneNumber) staff.phoneNumber = phoneNumber;
+    if (gender) staff.gender = gender;
+    if (govtID) staff.govtID = govtID;
     if (salary) staff.salary = salary;
     if (age) staff.age = age;
     if (department) staff.department = department;
