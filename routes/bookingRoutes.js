@@ -28,7 +28,7 @@ router.get("/:id", auth, bookingController.getBookingById);
 router.put(
   "/:id/status",
   auth,
-  roleCheck(["manager", "front_desk"]),
+  roleCheck("manager"),
   bookingController.updateBookingStatus
 );
 

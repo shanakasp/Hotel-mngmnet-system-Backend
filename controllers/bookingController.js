@@ -220,11 +220,11 @@ exports.createBooking = async (req, res) => {
       specialRequests,
       totalAmount: totalPrice,
       nights,
-      status: "confirmed",
+      status: "pending",
     });
 
     // Update room status
-    await room.update({ status: "booked" });
+    await room.update({ status: "pending" });
 
     // Send confirmation email
     try {
@@ -254,7 +254,7 @@ exports.createBooking = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "Booking confirmed successfully",
+      message: "Booking added successfully, Status pending",
       booking: bookingWithDetails,
     });
   } catch (error) {
