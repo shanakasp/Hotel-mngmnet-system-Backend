@@ -514,7 +514,7 @@ exports.createWalkInBooking = async (req, res) => {
       specialRequests,
       totalAmount: totalPrice,
       nights,
-      status: "confirmed", // Automatically check in for walk-in customers
+      status: "checked_in", // Automatically check in for walk-in customers
       createdBy: req.user.id, // Track which staff member created the booking
     });
 
