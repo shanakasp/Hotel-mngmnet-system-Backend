@@ -56,6 +56,11 @@ const Booking = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    frontDeskStatus: {
+      type: DataTypes.STRING,
+      defaultValue: "no",
+    },
+
     status: {
       type: DataTypes.ENUM(
         "pending",

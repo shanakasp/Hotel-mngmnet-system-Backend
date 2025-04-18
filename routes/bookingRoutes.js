@@ -32,6 +32,9 @@ router.put(
   bookingController.updateBookingStatus
 );
 
+//Front desk update status
+router.put("/:id/front-desk-status", bookingController.updateFrontDeskStatus);
+
 // Cancel booking (by user)
 router.put("/:id/cancel", auth, bookingController.cancelBooking);
 

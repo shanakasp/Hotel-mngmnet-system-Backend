@@ -307,6 +307,43 @@ exports.updateBookingStatus = async (req, res) => {
   }
 };
 
+exports.updateFrontDeskStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { frontDeskStatus } = req.body;
+
+    const booking = await Booking.findByPk(id, {
+      include: [{ model: Room }],
+    });
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    // Validate frontDeskStatus
+    const validStatuses = ["no", "front_desk_approved"];
+    if (!validStatuses.includes(frontDeskStatus)) {
+      return res.status(400).json({
+        message:
+          "Invalid frontDeskStatus value. Must be 'no' or 'front_desk_approved'",
+      });
+    }
+
+    // Update booking frontDeskStatus
+    await booking.update({ frontDeskStatus });
+
+    res.status(200).json({
+      message: "Front desk status updated successfully",
+      booking,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update front desk status",
+      error: error.message,
+    });
+  }
+};
+
 // Cancel booking (by user)
 exports.cancelBooking = async (req, res) => {
   try {
