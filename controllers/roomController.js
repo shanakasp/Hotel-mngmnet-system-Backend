@@ -163,34 +163,24 @@ exports.searchRoomByNumber = async (req, res) => {
   }
 };
 
-// Update room (Manager only)
+// Update a room (Manager only)
 exports.updateRoom = async (req, res) => {
   try {
-    const { roomNumber, type, price, capacity, description, status, ACorNot } =
-      req.body;
+    const { type, price, capacity, description, ACorNot } = req.body;
 
+    // Find the room to update
     const room = await Room.findByPk(req.params.id);
-
     if (!room) {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    // Check if new room number already exists (if being changed)
-    if (roomNumber && roomNumber !== room.roomNumber) {
-      const roomExists = await Room.findOne({ where: { roomNumber } });
-      if (roomExists) {
-        return res.status(400).json({ message: "Room number already exists" });
-      }
-    }
-
     // Update fields
-    if (roomNumber) room.roomNumber = roomNumber;
+
     if (type) room.type = type;
-    if (ACorNot) room.ACorNot = ACorNot;
+    if (ACorNot !== undefined) room.ACorNot = ACorNot;
     if (price) room.price = price;
     if (capacity) room.capacity = capacity;
     if (description) room.description = description;
-    if (status) room.status = status;
 
     await room.save();
 
@@ -203,11 +193,12 @@ exports.updateRoom = async (req, res) => {
 
       // If replacing all images, delete existing ones
       if (req.body.replaceImages === "true" && existingImages.length > 0) {
-        // Delete image files
+        // Delete images from Cloudinary
         for (const image of existingImages) {
-          const imagePath = path.join(__dirname, "..", image.imagePath);
-          if (fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath);
+          // Extract public_id from Cloudinary URL and delete
+          if (image.imagePath) {
+            // You would need a function to delete from Cloudinary here
+            // await deleteFromCloudinary(image.imagePath);
           }
         }
 
@@ -225,9 +216,12 @@ exports.updateRoom = async (req, res) => {
           i === 0 &&
           (req.body.replaceImages === "true" || existingImages.length === 0);
 
+        // Upload image to Cloudinary
+        const secureUrl = await uploadToCloudinary(file);
+
         const roomImage = await RoomImage.create({
           roomId: room.id,
-          imagePath: `/uploads/room_${room.id}/${file.filename}`,
+          imagePath: secureUrl,
           description: `Image ${i + 1} for Room ${room.roomNumber}`,
           isPrimary,
         });

@@ -13,7 +13,7 @@ router.post(
   uploadRoomImages,
   roomController.createRoom
 );
-router.put(
+router.patch(
   "/:id",
   auth,
   roleCheck("manager"),
