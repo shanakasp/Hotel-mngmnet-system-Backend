@@ -10,6 +10,7 @@ const Staff = sequelize.define("Staff", {
   govtID: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true, // Added unique constraint
   },
   name: {
     type: DataTypes.STRING,

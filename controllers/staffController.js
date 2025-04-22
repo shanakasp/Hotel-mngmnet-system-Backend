@@ -2,6 +2,7 @@ const Staff = require("../models/Staff");
 const { Op } = require("sequelize");
 
 // Create a new staff member (Manager only)
+// Create a new staff member (Manager only)
 exports.createStaff = async (req, res) => {
   try {
     const {
@@ -14,6 +15,15 @@ exports.createStaff = async (req, res) => {
       gender,
       govtID,
     } = req.body;
+
+    // Check if staff with the same govtID already exists
+    const existingStaff = await Staff.findOne({ where: { govtID } });
+    if (existingStaff) {
+      return res.status(400).json({
+        message: "Staff with this government ID already exists",
+        error: "Duplicate govtID",
+      });
+    }
 
     // Create new staff
     const staff = await Staff.create({
